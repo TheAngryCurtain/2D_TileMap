@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public enum eTileType { DeepWater, ShallowWater, Grass, Rock, Snow, Sand, Ice, PlainsGrass, JungleGrass, Tree, Mountain, Swamp };
-public enum eBiomeID { Forest, Jungle, Plains, Desert, Tundra, Swamp };
+public enum eBiomeID { None = -1, Forest, Jungle, Plains, Desert, Tundra, Swamp };
 
 [System.Serializable]
 public class Biome
@@ -38,15 +38,82 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private Tile[] mTiles;
     [SerializeField] private int mMapSize = 10;
 
-    private void Start()
+    // DEBUG
+    private Vector3Int DebugPlayerPos;
+    private TileBase DebugCurrentTile;
+    private eBiomeID DebugCurrentBiome;
+
+    // use OnEnable here because it's after Awake (to give VSEventManager time to setup) and before Start
+    private void OnEnable()
     {
+        Debug.Log("Adding Listener for Request");
+        VSEventManager.Instance.AddListener<GameEvents.RequestWorldGenEvent>(GenerateWorld);
+        VSEventManager.Instance.AddListener<GameEvents.PlayerPositionUpdateEvent>(PlayerPosUpdated);
+    }
+
+    private void GenerateWorld(GameEvents.RequestWorldGenEvent e)
+    {
+        Debug.Log("Generating...");
         int seed = UnityEngine.Random.Range(0, int.MaxValue);
         Debug.LogFormat("World Seed: {0}", seed);
 
         BuildOcean(seed);
         BuildTerrain(seed);
         BuildBiomes(seed);
+
+        e.Callback();
     }
+
+    private void PlayerPosUpdated(GameEvents.PlayerPositionUpdateEvent e)
+    {
+        DebugPlayerPos = mTerrainTileMap.WorldToCell(e.WorldPosition);
+        DebugCurrentTile = mTerrainTileMap.GetTile(DebugPlayerPos);
+
+        if (DebugCurrentTile != null)
+        {
+            // LOL UGH
+            switch (DebugCurrentTile.name)
+            {
+                case "grass_0":
+                    DebugCurrentBiome = eBiomeID.Forest;
+                    break;
+
+                case "grass_1":
+                    DebugCurrentBiome = eBiomeID.Plains;
+                    break;
+
+                case "grass_2":
+                    DebugCurrentBiome = eBiomeID.Jungle;
+                    break;
+
+                case "sand_0":
+                    DebugCurrentBiome = eBiomeID.Desert;
+                    break;
+
+                case "snow_0":
+                case "ice_water":
+                    DebugCurrentBiome = eBiomeID.Tundra;
+                    break;
+
+                case "swamp_0":
+                    DebugCurrentBiome = eBiomeID.Swamp;
+                    break;
+
+                default:
+                    DebugCurrentBiome = eBiomeID.None;
+                    break;
+            }
+        }
+    }
+
+#if UNITY_EDITOR
+    private void OnGUI()
+    {
+        GUI.Label(new Rect(10, 10, 300, 40), "Terrain Pos: " + DebugPlayerPos);
+        GUI.Label(new Rect(10, 30, 300, 40), "Tile: " + (DebugCurrentTile != null ? DebugCurrentTile.name : "NULL"));
+        GUI.Label(new Rect(10, 50, 300, 40), "Biome: " + (DebugCurrentBiome != eBiomeID.None ? DebugCurrentBiome.ToString() : "---"));
+    }
+#endif
 
     private void BuildOcean(int seed)
     {
