@@ -618,7 +618,7 @@ MonoBehaviour:
     mPrimaryTerrainTile: {fileID: 11400000, guid: 936e78cb7c74e054693ad4020ebb3d47,
       type: 2}
     mSecondaryTerrainTile: {fileID: 0}
-    mPrimaryVegetationTile: {fileID: 11400000, guid: d433bc1067f38cf4aae45ffb37d3fd1f,
+    mPrimaryVegetationTile: {fileID: 11400000, guid: ffd419b44cd0c7d48beeb75aa0f2e53c,
       type: 2}
     mSecondaryVegetationTile: {fileID: 0}
   - mBiomeID: 4
@@ -635,7 +635,7 @@ MonoBehaviour:
     mPrimaryTerrainTile: {fileID: 11400000, guid: 9713726514b116147a8051c6d1def397,
       type: 2}
     mSecondaryTerrainTile: {fileID: 0}
-    mPrimaryVegetationTile: {fileID: 11400000, guid: d433bc1067f38cf4aae45ffb37d3fd1f,
+    mPrimaryVegetationTile: {fileID: 11400000, guid: 1b052c30b89d1974dbf260fbcdb4d156,
       type: 2}
     mSecondaryVegetationTile: {fileID: 0}
   mTiles:
